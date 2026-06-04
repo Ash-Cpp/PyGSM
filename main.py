@@ -3,14 +3,10 @@ main.py
 function: 实现界面选择与主循环逻辑
 """
 from models import loadJson
+import util
 import sys
-
-def cliMainLoop() -> None:
-    print("cliMainLoop")
-
-def guiMainLoop() -> None:
-    pass
-    print("guiMainLoop")
+import subprocess
+import platform
 
 def main() -> None:
     try:
@@ -18,14 +14,14 @@ def main() -> None:
         startMode = config["defaultMode"]
         if startMode == "auto":
             startMode = config["lastMode"]
-        if startMode == "cli":
-            cliMainLoop()
-        elif startMode == "gui":
-                guiMainLoop()
-        else:
-            raise
     except:
-        print("config.json不存在或已被非法修改")
+        print("配置文件异常")
+    if startMode == "cli":
+        util.launchIndependent("./csys.py", True)
+    elif startMode == "gui":
+        util.launchIndependent("./gsys.py", False)
+    else:
+        print("配置文件异常")
     
 if __name__ == "__main__":
     main()
