@@ -8,16 +8,20 @@ class GradeManager:
     def __init__(self):
         self.__studentsBySid: dict[str, Student] = { }
         self.__studentsByName: dict[str, dict[str, Student]] = { }
+        self.__sortFlag = True
+        self.__sortedList = []
     
+    # 增加学生信息
     def add(self, student: Student) -> None:
 
         if student.sid in self.__studentsBySid:
-            raise ValueError(f"学号为{student.sid}的学生已经存在") 
+            raise ValueError(f"学号为{student.sid}的学生已经存在")
         self.__studentsBySid[student.sid] = student
         if student.name not in self.__studentsByName:
             self.__studentsByName[student.name] = { }
         self.__studentsByName[student.name][student.sid] = student
-    
+        self.__sortFlag = True
+    # 移除学生信息(sid)
     def removeBySid(self, sid: str) -> None:
         if sid in self.__studentsBySid:
 
@@ -27,23 +31,27 @@ class GradeManager:
             if not self.__studentsByName[name]:
                 del self.__studentsByName[name]
             del self.__studentsBySid[sid]
+            self.__sortFlag = True
 
         else:
             raise KeyError(f"不存在学号为{sid}的学生")
-    
+    # 移除学生信息(name)
     def removeByName(self, name: str) -> None:
         if name in self.__studentsByName:
             for inner in list(self.__studentsByName[name].keys()):
                 self.removeBySid(inner)
+            self.__sortFlag = True
         else:
             raise KeyError(f"不存在姓名为{name}的学生")
-    
+        
+    # 查找学生信息(sid),成功则返回studentInfo
     def selectBySid(self, sid: str) -> Student:
         if sid in self.__studentsBySid:
             return self.__studentsBySid[sid]
         else:
             raise KeyError(f"未查找到学号为{sid}的学生")
         
+    # 查找学生信息(name),成功则返回一个key为sid,value为studentInfo的字典
     def selectByName(self, name: str) -> dict:
         if name in self.__studentsByName:
             return self.__studentsByName[name]
@@ -54,15 +62,20 @@ class GradeManager:
         target = self.selectBySid(sid)
         for subject, newVal in newGrades.items():
             target.update(subject, newVal)
+        self.__sortFlag = True
     
     def getSortedList(self) -> list[Student]:
-        # 按照总分从大到小排序,总分一样就按照学号排序
-        students = self.__studentsBySid.values()
-        return sorted(students, key=lambda stu: (-stu.sum,stu.sid))
+        if self.__sortFlag:
+            # 按照总分从大到小排序,总分一样就按照学号排序
+            students = self.__studentsBySid.values()
+            self.__sortedList = sorted(students, key=lambda stu: (-stu.sum,stu.sid))
+            self.__sortFlag = False
+        return self.__sortedList
     
     def updateGrade(self, sid: str, subject: str, newVal: float) -> None:
         target = self.selectBySid(sid)
         target.update(subject, newVal) 
+        self.__sortFlag = True
     def toJson(self) -> str:
         studentsDict = {}
         for student in self.__studentsBySid.values():
