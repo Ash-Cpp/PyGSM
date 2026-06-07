@@ -242,7 +242,7 @@ class MainWindow(QWidget):
             self.setStyleSheet(light_qss)
 
     def handle_back_to_cli(self):
-        import util
+        import core.util as util
         self.close()
         util.launchIndependent("./csys.py", True)
         sys.exit(0)
