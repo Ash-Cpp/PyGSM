@@ -11,6 +11,7 @@ import core.stream as stream
 import core.storage as storage
 import core.util as util
 import core.models as models
+import os
 
 def getVaildChoose(n: int, InputInfo="请输入您的操作:", errorInfo="操作无效!!!") -> int:
     """获取合法控制台输入
@@ -70,19 +71,23 @@ def subAdd():
             subBack(addLoopFlag)
 
 def subRemove():
-    removeOptions = ["指定学号删除", "指定姓名删除(同名也会删除)"]
+    removeOptions = ["指定学号删除", "指定姓名删除(同名也会删除)", "返回"]
     removeLoopFlag = [ True ]
     print("按下[Ctrl+C]即可退出删除")
     stream.printOptions(removeOptions)
     while removeLoopFlag[0]:    
         try:
-            op = getVaildChoose(2, "当前在'删除'菜单,请输入您的操作:")
+            op = getVaildChoose(3, "当前在'删除'菜单,请输入您的操作:")
             if op == 1:
                 sid = input("请输入您想删除学生的学号:")
                 Manager.removeBySid(sid)
-            else:
-                name = input("请输入您想删除学生的姓名")
+            elif op == 2:
+                name = input("请输入您想删除学生的姓名:")
                 Manager.removeByName(name)
+            else:
+                subBack(removeLoopFlag)
+                continue
+            FHandler.saveToFile()
             print("删除成功!!!")
             FHandler.saveToFile()
         except KeyboardInterrupt:
@@ -102,18 +107,44 @@ def subUpdate():
             print("有以下记录")
             stream.printStudent(student)
             while True:
-                subject, newVal = input("请输入想修改的科目与新的分数(逗号分开):").split(",")
-                Manager.updateGrade(sid, subject, float(newVal))
-                print("更新成功!!!")
-                stream.printStudent(student)
-        except ValueError as e:
-            print(e)
+                try:
+                    subject, newVal = input("请输入想修改的科目与新的分数(逗号分开):").split(",")
+                    Manager.updateGrade(sid, subject, float(newVal))
+                    FHandler.saveToFile()
+                    print("更新成功!!!")
+                    stream.printStudent(student)
+                except Exception as e:
+                    print("无效输入!!!")
         except KeyboardInterrupt:
             print("您终止了操作")
             subBack(updateLoopFlag)
+        except Exception as e:
+            print(e)
 
 def subQuery():
-    pass
+    queryOptions = ["通过学号查询", "通过姓名查询", "返回"]
+    queryLoopFlag = [ True ]
+
+    print("按下[Ctrl+C]即可退出查询")
+    stream.printOptions(queryOptions)
+    while queryLoopFlag[0]:
+        try:
+            op = getVaildChoose(3, "当前在'查询'菜单',请输入您的操作:")
+            if op == 1:
+                sid = input("请输入您想要查询学生的学号:")
+                res = Manager.selectBySid(sid)
+                print("查询到以下记录")
+                stream.printStudent(res)
+            elif op == 2:
+                name = input("请输入您想查询的姓名:")
+                res = Manager.selectByName(name)
+                print("查询到以下记录")
+                stream.printStudentsTable(res.values())
+            else:
+                subBack(queryLoopFlag)
+        except KeyboardInterrupt:
+            print("您终止了操作")
+            subBack(queryLoopFlag)
 
 def subBack(LoopFlagPtr: list):
     LoopFlagPtr[0] = False
@@ -153,9 +184,6 @@ def subClearHistory(options: list[str] = []):
     stream.clearConsole()
     stream.printOptions(options)
 
-def subSetting():
-    pass
-
 def subToggleGUI():
     util.launchIndependent(PROJECT_ROOT / "gui" / "gsys.pyw", False)
     subExit()
@@ -179,19 +207,21 @@ def expectCall(func: callable, expectVal: bool = True) -> bool:
 def cliMainLoop() -> None:
     global Manager
     global FHandler
+    global CHandler
     FHandler = storage.FileHandler(PROJECT_ROOT / "data" / "studentsInfo.json")
+    CHandler = storage.ConfigHanlde(PROJECT_ROOT / "config.json")
     Manager =  FHandler.manager
+    CHandler.setLastMode("cli")
 
     mainOptions = ["查看总表", "增删改查", "清空操作记录", 
-                   "设置", "切换至图形界面", "退出系统"]
+                   "切换至图形界面", "退出系统"]
     stream.printOptions(mainOptions)
     mainRouter = {
         1: lambda: expectCall(subShowAll, False),
         2: lambda: expectCall(subCURD),
         3: lambda: expectCall(lambda: subClearHistory(mainOptions), False),
-        4: lambda: expectCall(subSetting),
-        5: lambda: expectCall(subToggleGUI),
-        6: lambda: expectCall(subExit)
+        4: lambda: expectCall(subToggleGUI),
+        5: lambda: expectCall(subExit)
     } # 主路由
     while True:
         try:

@@ -5,8 +5,45 @@ storage.py: 负责数据的读写与持久化
 from core.manager import *
 from core.models import *
 import atexit
+class ConfigHanlde:
+    def __init__(self, config: str = "../config.json"):
+        data = loadJson(config)
+        self.__defaultMode = data["defaultMode"]
+        self.__lastMode = data["lastMode"]
+        self.__config = config
+    
+    def saveToFile(self) -> None:
+        with open(self.__config, "w", encoding="utf-8") as f:
+            f.write(json.dumps({
+                "defaultMode" : self.__defaultMode,
+                "lastMode": self.__lastMode
+            }))
+
+    @property
+    def defaultMode(self) -> str:
+        return self.__defaultMode
+
+    def setDefaultMode(self, mode: str = "auto") -> None:
+        """启动模式设置
+
+        Args:
+            mode (str, optional): auto/gui/cli. Defaults to "auto".
+        """
+        self.__defaultMode = mode
+        self.saveToFile()
+    
+    def setLastMode(self, mode: str = "cli") -> None:
+        """上次打开的界面
+
+        Args:
+            mode (str, optional): cli/gui. Defaults to "cli".
+        """
+        self.__lastMode = mode
+        self.saveToFile()
+
+        
 class FileHandler:
-    def __init__(self, filename: str = "./data/studentsInfo.json"):
+    def __init__(self, filename: str = "../data/studentsInfo.json"):
         self.filename = filename
         data = loadJson(self.filename)
         self.manager = GradeManager()

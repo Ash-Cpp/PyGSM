@@ -136,7 +136,6 @@ class GradeManager:
         self.__sortList()
         return self.__sortedList
         
-    
     def updateGrade(self, sid: str, subject: str, newVal: float) -> None:
         target = self.selectBySid(sid)
         target.update(subject, newVal)

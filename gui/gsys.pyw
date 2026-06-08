@@ -17,7 +17,8 @@ def guiMainLoop() -> None:
     pass
     app = QApplication(sys.argv)
     fh = storage.FileHandler(PROJECT_ROOT / "data" / "studentsInfo.json")
-    window = mainwindow.MainWindow(app, manager=fh.manager)
+
+    window = mainwindow.MainWindow(app, fhandle= fh, manager=fh.manager)
     window.show()
     app.exec()
 

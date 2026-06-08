@@ -72,6 +72,8 @@ class Student:
             subject (str): 科目名称 
             newVal (any): 修改后的值
         """
+        if subject not in self.__grades:
+            raise KeyError(f"不存在'{subject}'科目")
         oldVal = self.__grades[subject]
         delta = newVal - oldVal
         self.__grades[subject] = newVal
