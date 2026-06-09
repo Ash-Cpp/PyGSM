@@ -29,10 +29,12 @@ def getValidChoose(n: int, inputInfo="请输入您的操作:", errorInfo="操作
         except ValueError:
             print(errorInfo)
 
-def subShowAll():
+def subShowAll(options: list[str]):
     """展示总表
     """
     stream.printStudentsTable(Manager.getSortedList())
+    if len(Manager.getSortedList()) > 30:
+        stream.printOptions(options)
 
 def subAdd():
     """添加学生模块

@@ -20,6 +20,10 @@ class GradeManager:
     def cnt(self) -> int:
         return self.__cnt
     
+    @cnt.setter
+    def cnt(self, value: int) -> None:
+        self.__cnt = value
+    
     def forceFlush(self) -> None:
         """强制触发下一次写入
         """
