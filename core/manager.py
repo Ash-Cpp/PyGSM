@@ -14,7 +14,16 @@ class GradeManager:
         self.__studentsByName: dict[str, dict[str, Student]] = { }
         self.__sortFlag = True
         self.__sortedList = []
-        self.cnt = 0 # 更新计数
+        self.__cnt = 0 # 更新计数
+    
+    @property
+    def cnt(self) -> int:
+        return self.__cnt
+    
+    def forceFlush(self) -> None:
+        """强制触发下一次写入
+        """
+        self.__cnt = self.FLUSH_CNT
     
     def add(self, student: Student) -> None:
         """添加一个学生对象
@@ -32,7 +41,7 @@ class GradeManager:
             self.__studentsByName[student.name] = { }
         self.__studentsByName[student.name][student.sid] = student
         self.__sortFlag = True
-        self.cnt += 1
+        self.__cnt += 1
 
     def removeBySid(self, sid: str) -> None:
         """移除指定学号的学生
@@ -50,7 +59,7 @@ class GradeManager:
                 del self.__studentsByName[name]
             del self.__studentsBySid[sid]
             self.__sortFlag = True
-            self.cnt += 1
+            self.__cnt += 1
         else:
             raise KeyError(f"不存在学号为{sid}的学生")
 
@@ -67,7 +76,7 @@ class GradeManager:
             for inner in list(self.__studentsByName[name].keys()):
                 self.removeBySid(inner)
             self.__sortFlag = True
-            self.cnt += 1
+            self.__cnt += 1
         else:
             raise KeyError(f"不存在姓名为{name}的学生")
         
@@ -116,7 +125,7 @@ class GradeManager:
         for subject, newVal in newGrades.items():
             target.update(subject, newVal)
         self.__sortFlag = True
-        self.cnt += self.FLUSH_CNT
+        self.__cnt += self.FLUSH_CNT
     
     def __sortList(self) -> None:
         """排序学生列表,懒更新
@@ -126,7 +135,7 @@ class GradeManager:
             students = self.__studentsBySid.values()
             self.__sortedList = sorted(students, key=lambda stu: (-stu.sum,stu.sid))
             self.__sortFlag = False
-            self.cnt += self.FLUSH_CNT
+            self.__cnt += self.FLUSH_CNT
 
     def getSortedList(self) -> list[Student]:
         """获取排序后的学生列表
@@ -137,12 +146,24 @@ class GradeManager:
         return self.__sortedList
         
     def updateGrade(self, sid: str, subject: str, newVal: float) -> None:
+        """更新指定学生的指定科目成绩
+
+        Args:
+            sid (str): 学生学号
+            subject (str): 科目名称
+            newVal (float): 新的成绩
+        """
         target = self.selectBySid(sid)
         target.update(subject, newVal)
-        self.cnt += self.FLUSH_CNT
+        self.__cnt += self.FLUSH_CNT
         self.__sortFlag = True
 
     def toJson(self) -> str:
+        """将学生数据序列化为JSON字符串
+
+        Returns:
+            str: JSON格式的字符串
+        """
         self.__sortList()
         studentsDict = {}
         for student in self.__studentsBySid.values():

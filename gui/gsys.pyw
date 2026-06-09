@@ -9,12 +9,8 @@ import core.util as util
 import core.mainwindow as mainwindow
 import core.storage as storage
 
-def toggleToCLI():
-    util.launchIndependent(PROJECT_ROOT / "cli" / "csys.py", True)
-    sys.exit(0)
 
 def guiMainLoop() -> None:
-    pass
     app = QApplication(sys.argv)
     fh = storage.FileHandler(PROJECT_ROOT / "data" / "studentsInfo.json")
 

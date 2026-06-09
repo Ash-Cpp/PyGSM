@@ -5,11 +5,11 @@ import sys
 import subprocess
 from pathlib import Path
 
-def launchIndependent(scriptName, hasConsole = True):
+def launchIndependent(scriptName: str, hasConsole: bool = True) -> None:
     """启动独立子进程
 
     Args:
-        scriptName (_type_): 需要执行的程序名称
+        scriptName (str): 需要执行的程序名称
         hasConsole (bool, optional): 是否需要控制台. Defaults to True.
     """
     current_executable = Path(sys.executable)

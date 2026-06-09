@@ -4,8 +4,11 @@ stream.py: IO流处理
 from core.models import Student
 from tabulate import tabulate
 import os
+import subprocess
 def clearConsole():
-    os.system("cls") # Python3.5后弃用
+    """清空控制台
+    """
+    subprocess.call("cls" if os.name == "nt" else "clear", shell=True)
 
 def printOptions(options: list[str]) -> None:
     """打印选项
@@ -29,7 +32,7 @@ def printStudent(student: Student) -> None:
         student (Student): 需要打印的学生信息
     """
     header =  ["学号", "姓名", "语文", "数学", "英语", "平均分", "总分"]
-    tabelData = [[
+    tableData = [[
         student.sid,
         student.name,
         f"{student['语文']:g}",
@@ -38,8 +41,7 @@ def printStudent(student: Student) -> None:
         f"{student.average:.2f}",
         f"{student.sum:g}", 
     ]]
-    i = 1
-    print(tabulate(tabelData, headers=header, tablefmt="rounded_grid", stralign="center", numalign="center"))
+    print(tabulate(tableData, headers=header, tablefmt="rounded_grid", stralign="center", numalign="center"))
 
 def printStudentsTable(students: list[Student]) -> None:
     """打印学生信息表
@@ -48,7 +50,7 @@ def printStudentsTable(students: list[Student]) -> None:
         students (list[Student]): 需要打印的学生(顺序)表
     """
     header =  ["排名", "学号", "姓名", "语文", "数学", "英语", "平均分", "总分"]
-    tabelData = []
+    tableData = []
     i = 1
     for s in students:
         row = [
@@ -62,5 +64,5 @@ def printStudentsTable(students: list[Student]) -> None:
             f"{s.sum:g}",
         ]
         i += 1
-        tabelData.append(row)
-    print(tabulate(tabelData, headers=header, tablefmt="rounded_grid", stralign="center", numalign="center"))
+        tableData.append(row)
+    print(tabulate(tableData, headers=header, tablefmt="rounded_grid", stralign="center", numalign="center"))

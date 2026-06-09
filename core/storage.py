@@ -2,10 +2,11 @@
 storage.py: 负责数据的读写与持久化
 """
 
-from core.manager import *
-from core.models import *
+from core.manager import GradeManager
+from core.models import loadJson, Student
+import json
 import atexit
-class ConfigHanlde:
+class ConfigHandle:
     def __init__(self, config: str = "../config.json"):
         data = loadJson(config)
         self.__defaultMode = data["defaultMode"]
@@ -56,7 +57,7 @@ class FileHandler:
     def safeExiting(self) -> None:
         """伪析构
         """
-        self.manager.cnt = self.manager.FLUSH_CNT
+        self.manager.forceFlush()
         self.saveToFile()
 
     def saveToFile(self) -> None:
