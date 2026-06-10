@@ -179,7 +179,7 @@ def subCURD():
         2: lambda: expectCall(subRemove, False),
         3: lambda: expectCall(subUpdate, False),
         4: lambda: expectCall(subQuery, False),
-        5: lambda: expectCall(subShowAll, False),
+        5: lambda: expectCall(lambda: subShowAll(curdOptions), False),
         6: lambda: expectCall(lambda: subClearHistory(curdOptions), False),
         7: lambda: expectCall(subToggleGUI),
         8: lambda: expectCall(lambda: subBack(curdLoopFlag), False),
@@ -243,7 +243,7 @@ def cliMainLoop() -> None:
                    "切换至图形界面", "退出系统"]
     stream.printOptions(mainOptions)
     mainRouter = {
-        1: lambda: expectCall(subShowAll, False),
+        1: lambda: expectCall(lambda: subShowAll(mainOptions), False),
         2: lambda: expectCall(subCURD),
         3: lambda: expectCall(lambda: subClearHistory(mainOptions), False),
         4: lambda: expectCall(subToggleGUI),
